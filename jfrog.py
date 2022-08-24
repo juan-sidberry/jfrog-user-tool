@@ -31,14 +31,17 @@ def get_usernames():
 
 
 def add_user(data):
+    print(" creating it now...\n")
     payload = {'name': data['username'], 'email': data['email'], 'password': data['password'], 'groups': data['groups']}
     results = requests.put(url + "/api/security/users/" + data['username'], auth=(config.login_name, config.apitoken), json=payload)
     stat_code = results.status_code
 
     if stat_code == 200 or stat_code == 201:
-        print(f"{data['username']} as been added to jFrog...")
+        print(f"{data['username']} as been added to jFrog...\n")
     else:
-        print(f"something went wrong...")
+        print(f"something went wrong...\n")
+        action_status = "error"
+        return action_status
 
 
 def delete_user(deleted_user):
@@ -47,7 +50,7 @@ def delete_user(deleted_user):
     if stat_code == 200 or stat_code == 201:
         print(f"\n{deleted_user} as been deleted from jFrog...\n")
     else:
-        print(f"something went wrong...")
+        print(f"something went wrong...\n")
 
 
 def get_username_and_email():
@@ -79,27 +82,30 @@ def get_username_and_email():
 
 
 def usage():
-    print(f"\nPlease enter --username and the --email parameters.\n")
-    print(f"Usage:\n\t-u, --user, --username\tusername\n\t-e, --email\t\temail-address\n\t-d, --delete")
-    print(f"Example: \n\tjfrog.py -u jsidberry -e juan.sidberry@insightglobal.com\n")
+    print(f"\nUsage:\n\t-u, --user, --username\tusername\n\t-e, --email first.last@domain.com\n\t-d, --delete username")
+    print(f"Examples: \n\tadd: python jfrog.py -u batman -e bruce.wayne@domain.com")
+    print(f"\tdel: python jfrog.py -d batman")
+    print()
     print(f"\nDefault password is:\n\tAbc_1234\n")
 
 
 def main():
     configuration_item = {}
     user_name, user_email = get_username_and_email()
+    action_status = ''
 
     if user_email != 'Deleted Email':
         usernames = get_usernames()
 
         if user_name not in usernames:
-            print(f"\n'{user_name}' is not in Artifactory. creating it now...\n")
+            print(f"\n'{user_name}' is not in Artifactory...\n")
             configuration_item['username'] = user_name
             configuration_item['email']    = user_email
             configuration_item['password'] = 'Abc_1234'
             configuration_item['groups']   = ["readers", "npm"]
-            add_user(configuration_item)
-            print(f'added user {user_name}\n')
+            action_status = add_user(configuration_item)
+            # if action_status == "error":
+            #     pass
         else:
             print(f"'{user_name}' already exist...\n")
 
